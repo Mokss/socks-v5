@@ -1,25 +1,16 @@
 const socks5 = require("../index");
 
-// const setAddr = new Set(["tools.ietf.org"]);
+const setAddr = new Set(["tools.ietf.org", "github.com", "2ip.ru"]);
 
 const server = socks5.createServer({
-  authenticate(name, password) {
-    // verify name/password
-    if (name !== "lexa12" || password !== "darksouls3") {
-      console.log("Пшел на хуй", name, password);
-      // respond with auth failure (can be any error)
-      return true;
-    }
-    // return successful authentication
-    return false;
+  filter(addr) {
+    const result = !setAddr.has(addr); 
+    if(!result) console.log(`host ${addr} unreachable`);
+    return result;
   }
-  // filter(addr) {
-  //   console.log(addr);
-  //   return setAddr.has(addr);
-  // }
 });
 
-server.listen(5550); // 5550 for prod, 1080 for dev
+server.listen(1080);
 
 server.on("connect", info =>
   console.log(`connected to remote server at ${info.addr}:${info.port}`)
@@ -32,12 +23,11 @@ server.on("listening", () => {
 });
 
 server.on("connection", socket => {
-  console.log("connection", socket.remoteAddress, socket.remotePort);
+  console.log("new socks connection", socket.remoteAddress, socket.remotePort);
 });
 
-// server.on("data", data => console.log(data));
+server.on("data", data => console.log(data));
 
 server.on("error", err => {
-  console.error("server ERROR");
-  console.error(err);
+  console.error(`server ERROR ---> ${err}`);
 });

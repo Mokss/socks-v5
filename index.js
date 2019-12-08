@@ -3,6 +3,7 @@ const constants = require("./lib/constants");
 const { getAddress, getPort } = require("./lib/handler");
 
 const createServer = options => {
+  options = options || {};
   const server = net.createServer(socket => {
     const authenticate = buffer => {
       //  +----+------+----------+------+----------+
@@ -17,22 +18,28 @@ const createServer = options => {
 
       // check socks version
       if (buffer[0] !== constants.AUTH_VERSION) {
-        console.log(`auth wrong socks version: ${buffer[0]}`);
+        server.emit(
+          "error",
+          `${socket.remoteAddress} : 
+          ${socket.remotePort} auth wrong socks version: ${buffer[0]}`
+        );
         const response = Buffer.from([
           constants.AUTH_VERSION,
           constants.AUTH_REPLIES.GENERAL_FAILURE
         ]);
         socket.end(response);
+        return;
       }
 
       const auth = options.authenticate(name, password);
 
-      if (auth) {
+      if (!auth) {
         const response = Buffer.from([
           constants.AUTH_VERSION,
           constants.AUTH_REPLIES.GENERAL_FAILURE
         ]);
         socket.end(response);
+        return;
       }
 
       const response = Buffer.from([
@@ -58,38 +65,53 @@ const createServer = options => {
       const port = getPort(buffer);
 
       if (buffer[0] !== constants.VERSION) {
-        console.error(`socks5 connect: wrong socks version: ${buffer[0]}`);
+        server.emit(
+          "error",
+          `${socket.remoteAddress}: 
+          ${socket.remotePort} socks5 connect: wrong socks version: 
+          ${buffer[0]}`
+        );
         const response = Buffer.from([0x05, constants.REPLIES.GENERAL_FAILURE]);
         socket.end(response);
+        return;
       }
 
       if (!addr) {
-        console.log("Unsuported address -- disconnecting");
+        server.emit(
+          "error",
+          `${socket.remoteAddress}: ${socket.remotePort} Unsuported address -- disconnecting`
+        );
         const response = Buffer.from([
           0x05,
           constants.REPLIES.ADDRESS_TYPE_NOT_SUPPORTED
         ]);
         socket.end(response);
+        return;
       }
 
       if (cmd !== constants.COMMANDS.CONNECT) {
         // Unsuported udp and bind metod
-        console.log("Unsuported metod command");
+        server.emit(
+          "error",
+          `${socket.remoteAddress}: ${socket.remotePort} Unsuported metod command`
+        );
         const response = Buffer.from([
           0x05,
           constants.REPLIES.COMMAND_NOT_SUPPORTED
         ]);
         socket.end(response);
+        return;
       }
 
       if (typeof options.filter === "function") {
         const result = options.filter(addr);
-        if (result) {
+        if (!result) {
           const response = Buffer.from([
             constants.VERSION,
             constants.REPLIES.HOST_UNREACHABLE
           ]);
           socket.end(response);
+          return;
         }
       }
 
@@ -122,6 +144,7 @@ const createServer = options => {
             constants.REPLIES.HOST_UNREACHABLE
           ]);
           socket.end(response);
+          return;
         }
 
         if (err.code === "ECONNREFUSED") {
@@ -130,6 +153,7 @@ const createServer = options => {
             constants.REPLIES.CONNECTION_REFUSED
           ]);
           socket.end(response);
+          return;
         }
         const response = Buffer.from([
           0x05,
@@ -148,9 +172,14 @@ const createServer = options => {
 
       // SOCKS Version 5 is the only support version
       if (buffer[0] !== constants.VERSION) {
-        console.error(`wrong socks version: ${buffer[0]}`);
+        server.emit(
+          "error",
+          `${socket.remoteAddress}: ${socket.remotePort} wrong socks version: 
+          ${buffer[0]}`
+        );
         const response = Buffer.from([0x05, constants.REPLIES.GENERAL_FAILURE]);
         socket.end(response);
+        return;
       }
 
       const auth = typeof options.authenticate === "function";
@@ -166,12 +195,15 @@ const createServer = options => {
         response[1] = constants.METHODS.NO_AUTHENTICATION;
         next = connect;
       } else {
-        console.log(
-          "Unsuported authentication method -- disconnecting, method",
-          buffer[2]
+        server.emit(
+          "error",
+          `${socket.remoteAddress}: ${socket.remotePort}
+          Unsuported authentication method -- disconnecting, method
+          ${buffer[2]}`
         );
         response[1] = constants.METHODS.NO_ACCEPTABLE_METHODS;
         socket.end(response);
+        return;
       }
 
       socket.write(response, () => {
@@ -190,34 +222,29 @@ const createServer = options => {
 };
 
 const createClient = options => {
-  console.log(options);
-  const { name, password } = options;
+  const { login, password } = options;
 
   const server = net.createServer(socket => {
-    const handshakeClient = data => {
+    const handshakeClient = () => {
       socket.write(
         Buffer.from([constants.VERSION, constants.METHODS.NO_AUTHENTICATION])
       );
-      console.log("Browser data ", data);
 
       socket.once("data", connectClient);
     };
 
     const connectServer = (mainServ, buffer) => {
-      mainServ.once("data", data => {
-        console.log("mainServ data ", data);
+      mainServ.once("data", () => {
         const res = Buffer.from([
           constants.AUTH_VERSION,
-          name.length,
-          ...Buffer.from(name, "utf8"),
+          login.length,
+          ...Buffer.from(login, "utf8"),
           password.length,
           ...Buffer.from(password, "utf8")
         ]);
 
         mainServ.write(res, () => {
-          mainServ.once("data", data => {
-            console.log("mainserv 2 data ", data);
-
+          mainServ.once("data", () => {
             mainServ.write(buffer, () => {
               mainServ.pipe(socket);
               socket.pipe(mainServ);
@@ -228,14 +255,6 @@ const createClient = options => {
     };
 
     const connectClient = buffer => {
-      const cmd = buffer[1];
-      const atyp = buffer[3];
-      const addr = getAddress(buffer);
-      const port = getPort(buffer);
-
-      console.log("Browser 2 data", buffer[0], cmd, atyp, addr, port);
-      console.log("Browser 2 data buffer ", buffer);
-
       const mainServ = net.connect(options);
 
       mainServ.on("error", err => {
