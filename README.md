@@ -4,20 +4,20 @@
 
 #### Does't support ipv6 address and udp/bind methods
 
-# Installation
+## Installation
 
   ```
     npm install socks-v5
   ```
 
-# TODO
+## TODO
 
   + ### IPV6 support
   + ### Add support UDP and BIND method
 
-# Example 
+## Example 
 
-## Create simple server
+### Create simple server
 ```javascript
 const { createServer } = require("../index");
 
@@ -26,7 +26,7 @@ const server = createServer();
 server.listen(1080); // any port
 ```
 
-## Create server with authentication
+### Create server with authentication
 
 ``` javascript
 const { createServer } = require("../index");
@@ -48,7 +48,7 @@ const server = createServer({
 server.listen(1080);
 ```
 
-## Create server with filter
+### Create server with filter
 
 ```javascript
 const { createServer }  = require("../index");
@@ -64,10 +64,10 @@ const server = createServer({
 });
 ```
 
-## __createServer(options)__
+### __createServer(options)__
 
-### ```options``` - is an object that describes how to use a proxy server
+#### ```options``` - is an object that describes how to use a proxy server
 
- + ## ```timeout``` - type number, Sets the socket to timeout after timeout milliseconds of inactivity on the socket. By default net.Socket do not have a timeout.
+ + #### ```timeout``` - type number, Sets the socket to timeout after timeout milliseconds of inactivity on the socket. By default net.Socket do not have a timeout.
 
  
