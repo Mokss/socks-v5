@@ -1,0 +1,38 @@
+{
+  "name": "socks-v5",
+  "version": "0.7.0",
+  "description": "Implementation of socks 5 version on node js",
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"No test specified\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MoksS/socks-v5.git"
+  },
+  "keywords": [
+    "socks5",
+    "socks",
+    "proxy",
+    "socks-v5",
+    "socksv5",
+    "socks-proxy",
+    "socks-client",
+    "socks5-client",
+    "socks-v5-client",
+    "socksv5-server",
+    "socks-server",
+    "socksServer",
+    "proxy-server"
+  ],
+  "author": "MoksS <skarobogyodko@gmail.com> (https://github.com/MoksS)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MoksS/socks-v5/issues"
+  },
+  "homepage": "https://github.com/MoksS/socks-v5#readme"
+}
