@@ -215,6 +215,11 @@ const createServer = options => {
       server.emit("error", err);
     });
 
+    socket.setTimeout(options.timeout || 120000);
+    socket.on("timeout", () => {
+      socket.destroy();
+    });
+    
     socket.once("data", handshake);
   });
 
