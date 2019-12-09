@@ -23,7 +23,7 @@ Does't support ipv6 address and udp/bind methods
 
 ### Create simple server
 ```javascript
-const { createServer } = require("socks-v5");
+const { createServer } = require("socks-proxy-v5");
 
 const server = createServer();
 
@@ -33,7 +33,7 @@ server.listen(1080); // any port
 ### Create server with authentication
 
 ``` javascript
-const { createServer } = require("socks-v5");
+const { createServer } = require("socks-proxy-v5");
 
 const server = createServer({
   authenticate(login, password) {
@@ -55,7 +55,7 @@ server.listen(1080);
 ### Create server with filter
 
 ```javascript
-const { createServer }  = require("socks-v5");
+const { createServer }  = require("socks-proxy-v5");
 
 const setAddr = new Set(["tools.ietf.org", "github.com", "2ip.ru"]);
 
@@ -75,7 +75,7 @@ const server = createServer({
 + __timeout__ - type ```number```. Sets the socket to timeout after timeout milliseconds of inactivity on the socket. Default set 2 minute. If timeout is 0, then the existing idle timeout is disabled
 
   ```javascript 
-  const { createServer }  = require("socks-v5");
+  const { createServer }  = require("socks-proxy-v5");
   const server = createServer({
     timeout: 10000 // 10 second
   });
@@ -142,7 +142,7 @@ Most browsers, windows, linux, spotify, don`t  support socks5 protocol authentic
 I wrote a crutch as a local server that supports authentication. The client consumes no more than 30 MB, you can create a daemon for this process using node-windows for the Windows operating system or running pm2 startup for Linux. Then connect to your local server.
 
 ```javascript 
-const { createClient } = require("socks-v5");
+const { createClient } = require("socks-proxy-v5");
 
 const setting = {
   host: "127.0.0.1", // your socks 5 server
