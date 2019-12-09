@@ -1,9 +1,11 @@
 const net = require("net");
 const constants = require("./lib/constants");
 const { getAddress, getPort } = require("./lib/handler");
+const process = require("process");
 
 const createServer = options => {
   options = options || {};
+
   const server = net.createServer(socket => {
     const authenticate = buffer => {
       //  +----+------+----------+------+----------+
@@ -28,7 +30,6 @@ const createServer = options => {
           constants.AUTH_REPLIES.GENERAL_FAILURE
         ]);
         socket.end(response);
-        return;
       }
 
       const auth = options.authenticate(name, password);
@@ -39,7 +40,6 @@ const createServer = options => {
           constants.AUTH_REPLIES.GENERAL_FAILURE
         ]);
         socket.end(response);
-        return;
       }
 
       const response = Buffer.from([
@@ -73,7 +73,6 @@ const createServer = options => {
         );
         const response = Buffer.from([0x05, constants.REPLIES.GENERAL_FAILURE]);
         socket.end(response);
-        return;
       }
 
       if (!addr) {
@@ -86,7 +85,6 @@ const createServer = options => {
           constants.REPLIES.ADDRESS_TYPE_NOT_SUPPORTED
         ]);
         socket.end(response);
-        return;
       }
 
       if (cmd !== constants.COMMANDS.CONNECT) {
@@ -100,7 +98,6 @@ const createServer = options => {
           constants.REPLIES.COMMAND_NOT_SUPPORTED
         ]);
         socket.end(response);
-        return;
       }
 
       if (typeof options.filter === "function") {
@@ -111,7 +108,6 @@ const createServer = options => {
             constants.REPLIES.HOST_UNREACHABLE
           ]);
           socket.end(response);
-          return;
         }
       }
 
@@ -144,7 +140,6 @@ const createServer = options => {
             constants.REPLIES.HOST_UNREACHABLE
           ]);
           socket.end(response);
-          return;
         }
 
         if (err.code === "ECONNREFUSED") {
@@ -153,7 +148,6 @@ const createServer = options => {
             constants.REPLIES.CONNECTION_REFUSED
           ]);
           socket.end(response);
-          return;
         }
         const response = Buffer.from([
           0x05,
@@ -179,7 +173,6 @@ const createServer = options => {
         );
         const response = Buffer.from([0x05, constants.REPLIES.GENERAL_FAILURE]);
         socket.end(response);
-        return;
       }
 
       const auth = typeof options.authenticate === "function";
@@ -203,7 +196,6 @@ const createServer = options => {
         );
         response[1] = constants.METHODS.NO_ACCEPTABLE_METHODS;
         socket.end(response);
-        return;
       }
 
       socket.write(response, () => {
@@ -221,6 +213,10 @@ const createServer = options => {
     });
     
     socket.once("data", handshake);
+  });
+
+  process.on("uncaughtException", err => {
+    server.emit("error", err);
   });
 
   return server;
