@@ -11,7 +11,7 @@ Does't support ipv6 address and udp/bind methods
 ## Installation
 
   ```
-    npm install socks-v5
+    npm install socks-proxy-v5
   ```
 
 ## TODO
