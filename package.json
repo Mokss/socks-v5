@@ -1,6 +1,6 @@
 {
   "name": "socks-proxy-v5",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Implementation of socks 5 version on node js",
   "main": "index.js",
   "directories": {
