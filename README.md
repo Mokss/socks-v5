@@ -139,7 +139,7 @@ work like [server.listen()](https://nodejs.org/dist/latest-v12.x/docs/api/net.ht
 ## Client
 
 Most browsers, windows, linux, spotify, don`t  support socks5 protocol authentication.
-I wrote a crutch as a local server that supports authentication. The server consumes no more than 20 MB, you can create a daemon for this process using node-windows for the Windows operating system or running pm2 startup for Linux. Then connect to your local server.
+I wrote a crutch as a local server that supports authentication. The client consumes no more than 30 MB, you can create a daemon for this process using node-windows for the Windows operating system or running pm2 startup for Linux. Then connect to your local server.
 
 ```javascript 
 const { createClient } = require("socks-v5");
