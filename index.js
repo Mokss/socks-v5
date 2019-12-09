@@ -29,7 +29,7 @@ const createServer = options => {
           constants.AUTH_VERSION,
           constants.AUTH_REPLIES.GENERAL_FAILURE
         ]);
-        socket.end(response);
+        return socket.end(response);
       }
 
       const auth = options.authenticate(name, password);
@@ -39,7 +39,7 @@ const createServer = options => {
           constants.AUTH_VERSION,
           constants.AUTH_REPLIES.GENERAL_FAILURE
         ]);
-        socket.end(response);
+        return socket.end(response);
       }
 
       const response = Buffer.from([
@@ -72,7 +72,7 @@ const createServer = options => {
           ${buffer[0]}`
         );
         const response = Buffer.from([0x05, constants.REPLIES.GENERAL_FAILURE]);
-        socket.end(response);
+        return socket.end(response);
       }
 
       if (!addr) {
@@ -84,7 +84,7 @@ const createServer = options => {
           0x05,
           constants.REPLIES.ADDRESS_TYPE_NOT_SUPPORTED
         ]);
-        socket.end(response);
+        return socket.end(response);
       }
 
       if (cmd !== constants.COMMANDS.CONNECT) {
@@ -97,7 +97,7 @@ const createServer = options => {
           0x05,
           constants.REPLIES.COMMAND_NOT_SUPPORTED
         ]);
-        socket.end(response);
+        return socket.end(response);
       }
 
       if (typeof options.filter === "function") {
@@ -107,7 +107,7 @@ const createServer = options => {
             constants.VERSION,
             constants.REPLIES.HOST_UNREACHABLE
           ]);
-          socket.end(response);
+          return socket.end(response);
         }
       }
 
@@ -128,6 +128,11 @@ const createServer = options => {
         server.emit("data", data);
       });
 
+      request.setTimeout(options.timeout || 120000);
+      request.on("timeout", () => {
+        request.destroy();
+      });
+
       request.on("error", err => {
         err.addr = addr;
         err.atyp = atyp;
@@ -139,7 +144,7 @@ const createServer = options => {
             0x05,
             constants.REPLIES.HOST_UNREACHABLE
           ]);
-          socket.end(response);
+          return socket.end(response);
         }
 
         if (err.code === "ECONNREFUSED") {
@@ -147,13 +152,13 @@ const createServer = options => {
             0x05,
             constants.REPLIES.CONNECTION_REFUSED
           ]);
-          socket.end(response);
+          return socket.end(response);
         }
         const response = Buffer.from([
           0x05,
           constants.REPLIES.NETWORK_UNREACHABLE
         ]);
-        socket.end(response);
+        return socket.end(response);
       });
     };
 
@@ -172,7 +177,7 @@ const createServer = options => {
           ${buffer[0]}`
         );
         const response = Buffer.from([0x05, constants.REPLIES.GENERAL_FAILURE]);
-        socket.end(response);
+        return socket.end(response);
       }
 
       const auth = typeof options.authenticate === "function";
@@ -195,7 +200,7 @@ const createServer = options => {
           ${buffer[2]}`
         );
         response[1] = constants.METHODS.NO_ACCEPTABLE_METHODS;
-        socket.end(response);
+        return socket.end(response);
       }
 
       socket.write(response, () => {
