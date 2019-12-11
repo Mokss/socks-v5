@@ -1,7 +1,6 @@
 const net = require("net");
 const constants = require("./lib/constants");
 const { getAddress, getPort } = require("./lib/handler");
-const process = require("process");
 
 const createServer = options => {
   options = options || {};
@@ -29,7 +28,8 @@ const createServer = options => {
           constants.AUTH_VERSION,
           constants.AUTH_REPLIES.GENERAL_FAILURE
         ]);
-        return socket.end(response);
+        socket.end(response);
+        return;
       }
 
       const auth = options.authenticate(name, password);
@@ -39,7 +39,8 @@ const createServer = options => {
           constants.AUTH_VERSION,
           constants.AUTH_REPLIES.GENERAL_FAILURE
         ]);
-        return socket.end(response);
+        socket.end(response);
+        return;
       }
 
       const response = Buffer.from([
@@ -72,7 +73,8 @@ const createServer = options => {
           ${buffer[0]}`
         );
         const response = Buffer.from([0x05, constants.REPLIES.GENERAL_FAILURE]);
-        return socket.end(response);
+        socket.end(response);
+        return;
       }
 
       if (!addr) {
@@ -84,7 +86,8 @@ const createServer = options => {
           0x05,
           constants.REPLIES.ADDRESS_TYPE_NOT_SUPPORTED
         ]);
-        return socket.end(response);
+        socket.end(response);
+        return;
       }
 
       if (cmd !== constants.COMMANDS.CONNECT) {
@@ -97,7 +100,8 @@ const createServer = options => {
           0x05,
           constants.REPLIES.COMMAND_NOT_SUPPORTED
         ]);
-        return socket.end(response);
+        socket.end(response);
+        return;
       }
 
       if (typeof options.filter === "function") {
@@ -107,18 +111,31 @@ const createServer = options => {
             constants.VERSION,
             constants.REPLIES.HOST_UNREACHABLE
           ]);
-          return socket.end(response);
+          socket.end(response);
+          return;
         }
       }
 
-      const request = net.connect(port, addr, () => {
-        buffer[1] = constants.REPLIES.SUCCEEDED;
+      let request;
 
-        socket.write(buffer, () => {
-          request.pipe(socket);
-          socket.pipe(request);
+      try {
+        request = net.connect(port, addr, () => {
+          buffer[1] = constants.REPLIES.SUCCEEDED;
+  
+          socket.write(buffer, () => {
+            request.pipe(socket);
+            socket.pipe(request);
+          });
         });
-      });
+      } catch (err) {
+        server.emit("error", err);
+        const response = Buffer.from([
+          0x05,
+          constants.REPLIES.NETWORK_UNREACHABLE
+        ]);
+        socket.end(response);
+        return
+      }
 
       request.on("connect", () => {
         server.emit("connect", { addr, port });
@@ -144,7 +161,8 @@ const createServer = options => {
             0x05,
             constants.REPLIES.HOST_UNREACHABLE
           ]);
-          return socket.end(response);
+          socket.end(response);
+          return;
         }
 
         if (err.code === "ECONNREFUSED") {
@@ -152,13 +170,15 @@ const createServer = options => {
             0x05,
             constants.REPLIES.CONNECTION_REFUSED
           ]);
-          return socket.end(response);
+          socket.end(response);
+          return;
         }
         const response = Buffer.from([
           0x05,
           constants.REPLIES.NETWORK_UNREACHABLE
         ]);
-        return socket.end(response);
+        socket.end(response);
+        return;
       });
     };
 
@@ -177,7 +197,8 @@ const createServer = options => {
           ${buffer[0]}`
         );
         const response = Buffer.from([0x05, constants.REPLIES.GENERAL_FAILURE]);
-        return socket.end(response);
+        socket.end(response);
+        return;
       }
 
       const auth = typeof options.authenticate === "function";
@@ -200,7 +221,8 @@ const createServer = options => {
           ${buffer[2]}`
         );
         response[1] = constants.METHODS.NO_ACCEPTABLE_METHODS;
-        return socket.end(response);
+        socket.end(response);
+        return;
       }
 
       socket.write(response, () => {
@@ -216,13 +238,10 @@ const createServer = options => {
     socket.on("timeout", () => {
       socket.destroy();
     });
-    
+
     socket.once("data", handshake);
   });
 
-  process.on("uncaughtException", err => {
-    server.emit("error", err);
-  });
 
   return server;
 };
