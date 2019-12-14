@@ -129,12 +129,8 @@ const createServer = options => {
         });
       } catch (err) {
         server.emit("error", err);
-        const response = Buffer.from([
-          0x05,
-          constants.REPLIES.NETWORK_UNREACHABLE
-        ]);
-        socket.end(response);
-        return
+        socket.destroy();
+        return;
       }
 
       request.on("connect", () => {
