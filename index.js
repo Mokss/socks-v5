@@ -77,7 +77,7 @@ const createServer = options => {
         return;
       }
 
-      if (!addr) {
+      if (!addr || !port) {
         server.emit(
           "error",
           `${socket.remoteAddress}: ${socket.remotePort} Unsuported address -- disconnecting`
@@ -116,22 +116,14 @@ const createServer = options => {
         }
       }
 
-      let request;
+      const request = net.connect(port, addr, () => {
+        buffer[1] = constants.REPLIES.SUCCEEDED;
 
-      try {
-        request = net.connect(port, addr, () => {
-          buffer[1] = constants.REPLIES.SUCCEEDED;
-  
-          socket.write(buffer, () => {
-            request.pipe(socket);
-            socket.pipe(request);
-          });
+        socket.write(buffer, () => {
+          request.pipe(socket);
+          socket.pipe(request);
         });
-      } catch (err) {
-        server.emit("error", err);
-        socket.destroy();
-        return;
-      }
+      });
 
       request.on("connect", () => {
         server.emit("connect", { addr, port });
@@ -174,7 +166,6 @@ const createServer = options => {
           constants.REPLIES.NETWORK_UNREACHABLE
         ]);
         socket.end(response);
-        return;
       });
     };
 
@@ -237,7 +228,6 @@ const createServer = options => {
 
     socket.once("data", handshake);
   });
-
 
   return server;
 };
