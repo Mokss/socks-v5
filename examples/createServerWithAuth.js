@@ -5,7 +5,7 @@ const server = createServer({
     // verify name/password
     if (login !== "foo" || password !== "bar") {
       console.log("authentication failed", login);
-      return false; 
+      return false;
       // authentication failed
     }
     console.log(`user ${login} connect`);

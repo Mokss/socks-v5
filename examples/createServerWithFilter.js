@@ -4,8 +4,8 @@ const setAddr = new Set(["tools.ietf.org", "github.com", "2ip.ru"]);
 
 const server = socks5.createServer({
   filter(addr) {
-    const result = !setAddr.has(addr); 
-    if(!result) console.log(`host ${addr} unreachable`);
+    const result = !setAddr.has(addr);
+    if (!result) console.log(`host ${addr} unreachable`);
     return result;
   }
 });
