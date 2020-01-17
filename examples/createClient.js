@@ -16,4 +16,4 @@ server.on("listening", () => {
   );
 });
 
-server.on("error", err => console.error(`Client Server Error ---> ${err}`));
+server.on("error", err => console.error("Client Server Error --->", err));

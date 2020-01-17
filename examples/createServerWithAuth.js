@@ -33,5 +33,5 @@ server.on("connection", socket => {
 server.on("data", data => console.log(data));
 
 server.on("error", err => {
-  console.error(`server ERROR ---> ${err}`);
+  console.error("server ERROR --->", err);
 });

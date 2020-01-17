@@ -1,6 +1,6 @@
 {
   "name": "socks-proxy-v5",
-  "version": "0.7.6",
+  "version": "0.7.7",
   "description": "Implementation of socks 5 version on node js",
   "main": "index.js",
   "directories": {
@@ -8,7 +8,8 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"No test specified\""
+    "test": "nodemon examples/createServer.js",
+    "perfomance": "nodemon test_perfomance.js"
   },
   "repository": {
     "type": "git",
@@ -35,12 +36,13 @@
     "url": "https://github.com/MoksS/socks-v5/issues"
   },
   "homepage": "https://github.com/MoksS/socks-v5#readme",
-  "dependencies": {
+  "devDependencies": {
     "eslint": "6.8.0",
     "eslint-config-airbnb-base": "14.0.0",
     "eslint-config-prettier": "6.9.0",
     "eslint-plugin-import": "2.20.0",
     "eslint-plugin-prettier": "3.1.2",
+    "nodemon": "2.0.2",
     "prettier": "1.19.1"
   }
 }
