@@ -45,7 +45,7 @@ function authenticate(server, socket, buffer, options) {
   ]);
 
   socket.write(response, () => {
-    socket.once("data", connect);
+    socket.once("data", buffer2 => connect(server, socket, buffer2, options));
   });
 }
 
