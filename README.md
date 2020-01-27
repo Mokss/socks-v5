@@ -165,3 +165,7 @@ server.on("error", err => console.error(`Client Server Error ---> ${err}`));
 
 See more [RFC1928](https://tools.ietf.org/html/rfc1928), [RFC1929](https://tools.ietf.org/html/rfc1929)  
 [examples](https://github.com/MoksS/socks-v5/tree/master/examples)
+
+## License
+
+[MIT](https://github.com/MoksS/socks-v5/blob/master/LICENSE)
