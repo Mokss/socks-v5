@@ -1,15 +1,16 @@
 {
   "name": "socks-proxy-v5",
-  "version": "0.7.71",
+  "version": "0.8.0",
   "description": "Implementation of socks 5 version on node js",
   "main": "index.js",
-  "directories": {
-    "example": "examples",
-    "lib": "lib"
+  "type": "module",
+  "engines": {
+    "node": ">= 16.0.0"
   },
   "scripts": {
-    "test": "nodemon examples/createServer.js",
-    "perfomance": "nodemon test_perfomance.js"
+    "dev": "nodemon examples/createServer.js",
+    "dev:auth": "nodemon examples/createServerWithAuth.js",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -28,21 +29,25 @@
     "socksv5-server",
     "socks-server",
     "socksServer",
-    "proxy-server"
+    "proxy-server",
+    "esmodule"
   ],
-  "author": "MoksS <skarobogyodko@gmail.com> (https://github.com/MoksS)",
+  "author": "MoksS <moksshuv@yandex.ru> (https://github.com/MoksS)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/MoksS/socks-v5/issues"
   },
   "homepage": "https://github.com/MoksS/socks-v5#readme",
   "devDependencies": {
-    "eslint": "6.8.0",
-    "eslint-config-airbnb-base": "14.0.0",
-    "eslint-config-prettier": "6.9.0",
-    "eslint-plugin-import": "2.20.0",
-    "eslint-plugin-prettier": "3.1.2",
-    "nodemon": "2.0.2",
-    "prettier": "1.19.1"
-  }
+    "eslint": "^8.46.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.28.0",
+    "nodemon": "^3.0.1"
+  },
+  "files": [
+    "index.js",
+    "lib",
+    "LICENSE",
+    "README.md"
+  ]
 }

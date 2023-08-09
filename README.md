@@ -6,7 +6,7 @@ Does't support ipv6 address and udp/bind methods
 
 ### Requirements
 
-+ Node.js v10.0+
++ Node.js v16.0+
 
 ## Installation
 
@@ -16,8 +16,9 @@ Does't support ipv6 address and udp/bind methods
 
 ## TODO
 
-  + IPV6 support
-  + Add support UDP and BIND method
+  - [ ] IPV6 support
+  - [ ] UDP ASSOCIATE
+  - [ ] BIND
 
 ## Server
 
@@ -109,8 +110,8 @@ Emitted when a new connection is made. socket is an instance of net.Socket
 + __error__   
   Emitted when an error occurs. 
     ```javascript   
-    server.on("error", err => {
-      console.error(`server ERROR ---> ${err}`);
+    server.on("error", error => {
+      console.error(error);
     });
   ```
 
@@ -136,34 +137,10 @@ Emitted when the server has been bound after calling server.listen()
 
 work like [server.listen()](https://nodejs.org/dist/latest-v12.x/docs/api/net.html#net_server_listen)
 
-## Client
 
-Most browsers, windows, linux, spotify, don`t  support socks5 protocol authentication.
-I wrote a crutch as a local server that supports authentication. The client consumes no more than 30 MB, you can create a daemon for this process using node-windows for the Windows operating system or running pm2 startup for Linux. Then connect to your local server
+## See more 
 
-```javascript 
-const { createClient } = require("socks-proxy-v5");
-
-const setting = {
-  host: "127.0.0.1", // your socks 5 server
-  port: "1080", // port your server
-  login: "foo",
-  password: "bar"
-};
-
-const server = createClient(setting);
-server.listen(1080);
-
-server.on("listening", () => {
-  console.log(
-    `server listening ${server.address().address}:${server.address().port}`
-  );
-});
-
-server.on("error", err => console.error(`Client Server Error ---> ${err}`));
-```
-
-See more [RFC1928](https://tools.ietf.org/html/rfc1928), [RFC1929](https://tools.ietf.org/html/rfc1929)  
+[RFC1928](https://tools.ietf.org/html/rfc1928), [RFC1929](https://tools.ietf.org/html/rfc1929)  
 [examples](https://github.com/MoksS/socks-v5/tree/master/examples)
 
 ## License
